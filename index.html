@@ -294,50 +294,7 @@ window.setApplicationStatus = async (id, status) => {
   await renderAdminApps();
   toast(status === 'approved' ? 'Başvuru onaylandı.' : 'Başvuru reddedildi.');
 };
-  const el = $('adminApplications');
 
-  if (!remoteAdmin || !supabaseReady) {
-    el.innerHTML = '<div class="empty">Başvuruları görmek için yönetici hesabıyla giriş yap.</div>';
-    return;
-  }
-
-  const { data, error } = await supabaseClient
-    .from('join_applications')
-    .select('*')
-    .order('created_at', { ascending: false });
-
-  if (error) {
-    el.innerHTML = '<div class="empty">Başvurular alınamadı: ' + safe(error.message) + '</div>';
-    return;
-  }
-
-  if (!data || !data.length) {
-    el.innerHTML = '<div class="empty">Henüz başvuru yok.</div>';
-    return;
-  }
-
-  el.innerHTML = `<table>
-    <thead><tr>
-      <th>Oyuncu</th><th>Yaş / Rank</th><th>Tanıtım</th><th>Durum</th><th>İşlem</th>
-    </tr></thead>
-    <tbody>${data.map(a => {
-      const status = a.status || 'pending';
-      const statusText = status === 'pending' ? 'Onay bekliyor' :
-        status === 'approved' ? 'Onaylandı' : 'Reddedildi';
-
-      return `<tr>
-        <td><strong>${safe(a.game_nick)}</strong><br>
-          ${safe(a.full_name)}<br>
-          <small>Kod: ${safe(a.tracking_code)}</small>
-        </td>
-        <td>${safe(a.age)}<br>${safe(a.rank)}</td>
-        <td>${safe(a.introduction || '—')}</td>
-        <td>${safe(statusText)}</td>
-        <td>${status === 'pending' ? 'Yönetici işlemi sonraki adımda bağlanacak.' : '—'}</td>
-      </tr>`;
-    }).join('')}</tbody>
-  </table>`;
-}
 window.setStatus=(kind,id,status)=>{let arr=kind==='match'?state.matches:state.applications;let item=arr.find(x=>x.id===id);if(!item)return;if(kind==='match'&&status==='approved'&&state.matches.some(m=>m.id!==id&&m.date===item.date&&m.time===item.time&&m.status==='approved')){toast('Bu saat başka bir onaylı maçta kullanılıyor.');return}item.status=status;save(state);renderAdmin();renderTimeOptions();toast('Durum güncellendi: '+({approved:'Onaylandı',rejected:'Reddedildi'}[status]));};
 window.editPlayer=id=>{let p=state.players.find(x=>x.id===id);if(!p)return;$('editPlayerId').value=id;$('editPlayerNick').value=p.nick;$('editPlayerRank').value=p.rank;$('editPlayerPhoto').value='';$('editModal').classList.remove('hidden')};
 window.deletePlayer=async id=>{let p=state.players.find(x=>x.id===id);if(!p||!confirm(p.nick+' kadrodan silinsin mi?'))return;
