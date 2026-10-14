@@ -13,12 +13,17 @@
 .home-page{padding:26px 0 55px}.home-hero{display:grid;grid-template-columns:1.05fr .95fr;gap:28px;align-items:stretch;padding:20px 0 38px}.home-copy{padding:30px 0;align-self:center}.home-copy h1{font-size:clamp(46px,7vw,82px);line-height:.93;letter-spacing:-.06em;margin:17px 0 20px}.home-copy h1 span{color:var(--red)}.home-copy p{color:#c2c2ce;line-height:1.75;max-width:540px}.home-copy .small-actions{margin-top:24px}.home-copy .btn{padding:13px 16px}.home-copy .logo-strip{margin-top:25px}.home-hero .hero-art{min-height:340px;border-radius:22px}.hero-stamp{position:absolute;z-index:2;bottom:16px;right:18px;border:1px solid #ef233c99;background:#09090dcc;border-radius:7px;padding:7px 10px;font-size:10px;font-weight:900;letter-spacing:.18em}.hub-heading{display:flex;align-items:end;justify-content:space-between;gap:15px;margin:12px 0 18px}.hub-heading h2{font-size:clamp(25px,4vw,34px);margin:7px 0}.hub-heading .sub{margin:0}.hub-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:15px}.hub-card{position:relative;min-height:160px;text-align:left;padding:22px;border-radius:16px;border:1px solid #303039;background:linear-gradient(145deg,#19191f,#101014);color:var(--white);display:flex;flex-direction:column;align-items:flex-start;gap:9px;transition:transform .18s,border-color .18s,background .18s}.hub-card:hover,.hub-card:focus-visible{transform:translateY(-3px);border-color:var(--red);background:linear-gradient(145deg,#281018,#121216);outline:none}.hub-card.featured{border-color:#ef233c99;background:linear-gradient(145deg,#3a0d18,#171116)}.hub-icon{display:grid;place-items:center;width:38px;height:38px;border:1px solid #ef233c88;border-radius:11px;color:#ff6475;font-size:22px;background:#ef233c12}.hub-title{font-size:17px;font-weight:900;margin-top:3px}.hub-desc{font-size:12px;line-height:1.5;color:var(--muted);padding-right:15px}.hub-arrow{position:absolute;right:20px;top:20px;font-size:20px;color:#ff6475}.navlinks button{transition:background .18s,border-color .18s}.navlinks button:focus-visible{outline:2px solid var(--red);outline-offset:2px}
 @media(max-width:850px){.home-hero{grid-template-columns:1fr;padding-top:5px}.home-copy{padding:22px 0 5px}.home-hero .hero-art{min-height:250px}.hub-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.hero{grid-template-columns:1fr;padding-top:42px}.hero-art{min-height:240px}.grid{grid-template-columns:repeat(3,minmax(0,1fr))}.two{grid-template-columns:1fr}.nav{align-items:flex-start;padding:12px 0;flex-direction:column}.navlinks{width:100%;overflow:auto;flex-wrap:nowrap}.navlinks button{white-space:nowrap}}
 @media(max-width:560px){.home-page{padding-top:14px}.home-copy h1{font-size:52px}.hub-grid{grid-template-columns:1fr}.hub-card{min-height:128px;padding:18px}.hub-heading{align-items:flex-start;flex-direction:column}.wrap{padding:0 14px}.grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.form-grid{grid-template-columns:1fr}.rank-picks{grid-template-columns:repeat(2,1fr)}.section{padding:26px 0 38px}.hero h1{font-size:46px}.section-head{align-items:flex-start;flex-direction:column}}
+
+.brand-mark-img{display:block;width:100%;height:100%;object-fit:contain;background:transparent}
+#heroArt img{width:76%;height:76%;object-fit:contain;background:transparent;filter:drop-shadow(0 12px 28px rgba(0,0,0,.4))}
+#logoStrip img{width:64px;height:64px;object-fit:contain;background:transparent}
+
 </style>
 </head>
 <body>
 <header class="topbar"><div class="wrap nav">
   <div class="brand" id="brand">
-    <div class="brand-mark">F4F</div><div>F4F ESPORTS<small>FIGHT FOR FREEDOM · PS5</small></div>
+    <div class="brand-mark"><img src="assets/f4f-logo-transparent.png" alt="F4F" class="brand-mark-img"></div><div>F4F ESPORTS<small>FIGHT FOR FREEDOM · PS5</small></div>
   </div>
   <nav class="navlinks" aria-label="Ana menü">
     <button data-go="home">Ana Sayfa</button><button data-go="players">Oyuncular</button><button data-go="matches">Maç Geçmişi</button><button data-go="request">Maç Talebi</button><button data-go="join">Klana Katıl</button><button id="adminNav">Yönetici</button>
@@ -96,8 +101,8 @@
 <section class="section" id="admin">
  <div class="section-head"><div><div class="eyebrow">Private console</div><h2>Yönetici paneli</h2><div class="sub">Oyuncuları, başvuruları ve maç taleplerini yönet.</div></div></div>
  <div id="adminLogin" class="panel">
-  <form id="loginForm"><div class="form-grid"><div class="field"><label for="adminUser">Kullanıcı adı</label><input id="adminUser" required autocomplete="username" placeholder="Yönetici kullanıcı adı"></div><div class="field"><label for="adminPass">Şifre</label><input id="adminPass" required type="password" autocomplete="current-password" placeholder="Yönetici şifresi"></div></div><button class="btn primary" type="submit">Giriş yap</button></form>
-  <div class="notice bad">ÖNEMLİ: Bu paket bir prototiptir. İlk kurulumda demo giriş bilgileri admin / F4Fdemo2026! şeklindedir. Bu ön yüz girişi güvenli üretim kimlik doğrulaması değildir. Siteyi internete açmadan önce gerçek sunucu taraflı kimlik doğrulama kurulmalıdır.</div>
+  <form id="loginForm"><div class="form-grid"><div class="field"><label for="adminUser">Yönetici e-postası</label><input id="adminUser" required type="email" autocomplete="username" placeholder="Supabase kullanıcı e-postası"></div><div class="field"><label for="adminPass">Şifre</label><input id="adminPass" required type="password" autocomplete="current-password" placeholder="Yönetici şifresi"></div></div><button class="btn primary" type="submit">Giriş yap</button></form>
+  <div class="notice">Supabase bağlantısı için aşağıdaki JavaScript bölümündeki Publishable Key alanını doldur. Yönetici girişi, Supabase Authentication hesabınla yapılır.</div>
  </div>
  <div id="adminArea" class="admin-area">
   <div class="small-actions" style="margin-bottom:16px"><button class="btn" id="logoutBtn">Çıkış yap</button><button class="btn" id="exportBtn">Verileri JSON indir</button><button class="btn" id="resetDemoBtn">Demo verilerini sıfırla</button></div>
@@ -117,10 +122,15 @@
  </div>
 </section>
 </main>
-<footer class="footer"><div class="wrap"><strong>F4F ESPORTS · F4FCLAN</strong><p>Family · Loyalty · Victory — PlayStation 5 Console Valorant</p><p>Bu sürüm yerel çalışan bir prototiptir. Veriler aynı tarayıcıda saklanır; farklı cihazlarla ortak kullanım, gerçek rezervasyon kilidi, güvenli yönetici girişi ve e-posta bildirimleri için sunucu/veri tabanı bağlantısı gerekir.</p></div></footer>
+<footer class="footer"><div class="wrap"><strong>F4F ESPORTS · F4FCLAN</strong><p>Family · Loyalty · Victory — PlayStation 5 Console Valorant</p><p>Oyuncu kadrosu Supabase bağlantısı ayarlandığında ortak veritabanından yüklenir. Maç talepleri, klan başvuruları ve maç geçmişi bu sürümde hâlâ yerel tarayıcıda saklanır.</p></div></footer>
 <div id="toast" class="toast hidden" role="status"></div>
 <div id="editModal" class="modal-backdrop hidden"><div class="modal"><h3>Oyuncuyu düzenle</h3><form id="editPlayerForm"><input id="editPlayerId" type="hidden"><div class="field"><label for="editPlayerNick">Oyun nicki</label><input id="editPlayerNick" required maxlength="40"></div><div class="field"><label for="editPlayerRank">Rank</label><select id="editPlayerRank"><option>Diamond</option><option>Ascendant</option><option>Immortal</option><option>Radiant</option></select></div><div class="field"><label for="editPlayerPhoto">Yeni avatar yükle</label><input id="editPlayerPhoto" type="file" accept="image/*"></div><div class="small-actions"><button class="btn primary" type="submit">Kaydet</button><button class="btn" type="button" id="closeModal">İptal</button></div></form></div></div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
+const SUPABASE_URL='https://tzlitqojgggrdsrpeycq.supabase.co';
+const SUPABASE_PUBLISHABLE_KEY='sb_publishable_WrWncE8881kMJEWQLuTjAA_MO3A2KXs';
+const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
+let supabaseReady = SUPABASE_PUBLISHABLE_KEY !== 'sb_publishable_WrWncE8881kMJEWQLuTjAA_MO3A2KXs';
 const KEY='f4f_esports_prototype_v1';
 const RANKS=['Diamond','Ascendant','Immortal','Radiant'];
 const TIMES=['19:00','20:00','21:00','22:00'];
@@ -134,13 +144,26 @@ return 'data:image/svg+xml;charset=utf-8,'+encodeURIComponent(svg)}
 function seed(){return {players:Array.from({length:20},(_,i)=>({id:'p'+(i+1),nick:'F4F Oyuncu '+String(i+1).padStart(2,'0'),rank:RANKS[i%4],avatar:svgAvatar(i)})),matches:[],applications:[],history:[]}}
 function load(){try{let x=JSON.parse(localStorage.getItem(KEY));if(x&&x.players&&x.matches&&x.applications&&x.history)return x}catch(e){}let x=seed();save(x);return x}
 function save(x){localStorage.setItem(KEY,JSON.stringify(x));state=x}
-let state=load(),adminLogged=false;
+let state=load(),adminLogged=false,remoteAdmin=false;
 function toast(msg){$('toast').textContent=msg;$('toast').classList.remove('hidden');setTimeout(()=>$('toast').classList.add('hidden'),3000)}
 function go(id){document.querySelectorAll('main section').forEach(s=>s.classList.add('hidden'));$(id).classList.remove('hidden');window.scrollTo({top:0,behavior:'smooth'});if(id==='admin')renderAdmin()}
 document.querySelectorAll('[data-go]').forEach(b=>b.addEventListener('click',()=>go(b.dataset.go)));
 $('adminNav').addEventListener('click',()=>go('admin'));
-function renderLogos(){let strip=$('logoStrip');strip.innerHTML='';let logo='assets/f4f-main-logo.jpeg',controller='assets/f4f-controller-logo.jpeg';let html='';if(fileExists(logo))html+=`<img src="${logo}" alt="F4F ana logo">`;if(fileExists(controller))html+=`<img src="${controller}" alt="F4F konsol logosu">`;strip.innerHTML=html+'<span>F4FCLAN · PlayStation 5</span>';if(fileExists(logo))$('heroArt').innerHTML=`<img src="${logo}" alt="F4F Fight For Freedom logosu">`}
+function renderLogos(){let strip=$('logoStrip');strip.innerHTML='';let logo='assets/f4f-logo-transparent.png';let html='';if(fileExists(logo))html+=`<img src="${logo}" alt="F4F Esports logosu">`;strip.innerHTML=html+'<span>F4FCLAN · PlayStation 5</span>';if(fileExists(logo))$('heroArt').innerHTML=`<img src="${logo}" alt="F4F Fight For Freedom logosu">`}
 function fileExists(path){return true} // Relative images may be absent in a standalone preview; browser handles fallback.
+async function fetchRemotePlayers(){
+ if(!supabaseReady)return false;
+ const {data,error}=await supabaseClient.from('players').select('id,nick,rank,avatar_url,active,sort_order').eq('active',true).order('sort_order',{ascending:true});
+ if(error){console.error(error);toast('Oyuncular veritabanından alınamadı. RLS ayarlarını kontrol et.');return false}
+ state.players=(data||[]).map(p=>({id:p.id,nick:p.nick,rank:p.rank,avatar:p.avatar_url||svgAvatar(0),remote:true}));
+ return true;
+}
+async function requireRemoteAdmin(){
+ if(!supabaseReady){toast('Önce Supabase Publishable Key ayarlanmalı.');return false}
+ const {data:{user}}=await supabaseClient.auth.getUser();
+ if(!user){toast('Önce yönetici hesabıyla giriş yap.');return false}
+ return true;
+}
 function renderPlayers(){ $('playerCount').textContent=state.players.length+' oyuncu';$('playerGrid').innerHTML=state.players.length?state.players.map(p=>`<article class="card player-card"><img class="avatar" src="${p.avatar||svgAvatar(0)}" alt="${safe(p.nick)} avatar"><div class="player-name">${safe(p.nick)}</div><span class="pill rank">${safe(p.rank)}</span></article>`).join(''):'<div class="empty">Henüz oyuncu eklenmemiş.</div>'}
 function renderHistory(){$('matchHistory').innerHTML=state.history.length?`<div class="table-wrap"><table><thead><tr><th>Tarih</th><th>Rakip klan</th><th>Skor</th><th>Sonuç</th></tr></thead><tbody>${state.history.slice().sort((a,b)=>b.date.localeCompare(a.date)).map(h=>`<tr><td>${safe(h.date)}</td><td>${safe(h.opponent)}</td><td><strong>${safe(h.score)}</strong></td><td>${safe(h.result)}</td></tr>`).join('')}</tbody></table></div>`:'<div class="empty">Henüz maç sonucu eklenmedi. Yönetici panelinden karşılaşma geçmişini oluşturabilirsin.</div>'}
 function renderRankChecks(){ $('matchRanks').innerHTML=RANKS.map(r=>`<label class="rank-choice"><input type="checkbox" name="matchRank" value="${r}"><span>${r}</span></label>`).join('')}
@@ -152,24 +175,49 @@ $('matchForm').addEventListener('submit',e=>{e.preventDefault();let ranks=[...do
 $('joinForm').addEventListener('submit',e=>{e.preventDefault();let code='F4F-'+uid();state.applications.push({id:uid(),code,nick:$('joinNick').value.trim(),name:$('joinName').value.trim(),age:Number($('joinAge').value),rank:$('joinRank').value,about:$('joinAbout').value.trim(),status:'pending',created:new Date().toISOString()});save(state);$('joinForm').reset();$('joinSubmitResult').innerHTML=`<div class="notice good"><strong>Başvurun alındı.</strong><br>Takip kodun: <strong>${code}</strong><br>F4F yönetiminin değerlendirmesini bekle. Kodunu sakla; sonucu sorgulama bölümünden görebilirsin.</div>`;toast('Başvuru kaydedildi.');});
 $('trackForm').addEventListener('submit',e=>{e.preventDefault();let code=$('trackCode').value.trim().toUpperCase(),item=state.matches.find(x=>x.code===code),kind='Maç talebi';if(!item){item=state.applications.find(x=>x.code===code);kind='Klan başvurusu'}if(!item){$('trackResult').innerHTML='<div class="notice bad">Bu kodla eşleşen bir kayıt bulunamadı.</div>';return}let statusText={pending:'Onay bekleniyor',approved:'Onaylandı',rejected:'Reddedildi'}[item.status];$('trackResult').innerHTML=`<div class="notice ${item.status==='approved'?'good':item.status==='rejected'?'bad':''}"><strong>${kind}</strong><br>Durum: <strong>${statusText}</strong>${kind==='Maç talebi'?`<br>Klan: ${safe(item.clan)}<br>Talep: ${safe(item.date)} · ${safe(item.time)}<br>Ranklar: ${safe(item.ranks.join(' + '))}`:`<br>Oyun nicki: ${safe(item.nick)}<br>Rank: ${safe(item.rank)}`}</div>`});
 function renderAdmin(){if(!adminLogged){$('adminLogin').classList.remove('hidden');$('adminArea').classList.remove('show');return}$('adminLogin').classList.add('hidden');$('adminArea').classList.add('show');renderAdminPlayers();renderAdminMatches();renderAdminApps()}
-$('loginForm').addEventListener('submit',e=>{e.preventDefault();if($('adminUser').value==='admin'&&$('adminPass').value==='F4Fdemo2026!'){adminLogged=true;renderAdmin();toast('Demo yönetici oturumu açıldı.')}else toast('Giriş bilgileri hatalı. Demo bilgilerini kontrol et.')});
-$('logoutBtn').addEventListener('click',()=>{adminLogged=false;renderAdmin();toast('Çıkış yapıldı.')});
+$('loginForm').addEventListener('submit',async e=>{
+ e.preventDefault();
+ if(!supabaseReady){toast('Önce SUPABASE_PUBLISHABLE_KEY alanına Publishable Key eklenmeli.');return}
+ const {data,error}=await supabaseClient.auth.signInWithPassword({email:$('adminUser').value.trim(),password:$('adminPass').value});
+ if(error){toast('Giriş başarısız: e-posta ve şifreyi kontrol et.');return}
+ remoteAdmin=true;adminLogged=true;await fetchRemotePlayers();renderAdmin();toast('Yönetici girişi başarılı.');
+});
+$('logoutBtn').addEventListener('click',async()=>{if(supabaseReady)await supabaseClient.auth.signOut();adminLogged=false;remoteAdmin=false;renderAdmin();toast('Çıkış yapıldı.')});
 function renderAdminPlayers(){$('adminPlayers').innerHTML=`<table><thead><tr><th>Avatar</th><th>Nick</th><th>Rank</th><th>İşlemler</th></tr></thead><tbody>${state.players.map(p=>`<tr><td><img src="${p.avatar}" alt="" style="width:44px;height:44px;object-fit:cover;border-radius:8px"></td><td>${safe(p.nick)}</td><td>${safe(p.rank)}</td><td><div class="small-actions"><button class="btn" onclick="editPlayer('${p.id}')">Düzenle</button><button class="btn" onclick="deletePlayer('${p.id}')">Sil</button></div></td></tr>`).join('')}</tbody></table>`}
 function statusPill(s){return `<span class="status ${s}">${({pending:'Onay bekliyor',approved:'Onaylandı',rejected:'Reddedildi'})[s]}</span>`}
 function renderAdminMatches(){$('adminMatches').innerHTML=state.matches.length?`<table><thead><tr><th>Klan / iletişim</th><th>Ranklar</th><th>Tarih / saat</th><th>Durum</th><th>İşlem</th></tr></thead><tbody>${state.matches.map(m=>`<tr><td><strong>${safe(m.clan)}</strong><br>${safe(m.contact)}<br><small>Kod: ${safe(m.code)}</small></td><td>${safe(m.ranks.join(' + '))}</td><td>${safe(m.date)}<br>${safe(m.time)}</td><td>${statusPill(m.status)}</td><td><div class="small-actions">${m.status==='pending'?`<button class="btn primary" onclick="setStatus('match','${m.id}','approved')">Onayla</button><button class="btn" onclick="setStatus('match','${m.id}','rejected')">Reddet</button>`:'—'}</div></td></tr>`).join('')}</tbody></table>`:'<div class="empty">Henüz maç talebi yok.</div>'}
 function renderAdminApps(){$('adminApplications').innerHTML=state.applications.length?`<table><thead><tr><th>Oyuncu</th><th>Yaş / Rank</th><th>Tanıtım</th><th>Durum</th><th>İşlem</th></tr></thead><tbody>${state.applications.map(a=>`<tr><td><strong>${safe(a.nick)}</strong><br>${safe(a.name)}<br><small>Kod: ${safe(a.code)}</small></td><td>${safe(a.age)}<br>${safe(a.rank)}</td><td>${safe(a.about||'—')}</td><td>${statusPill(a.status)}</td><td><div class="small-actions">${a.status==='pending'?`<button class="btn primary" onclick="setStatus('app','${a.id}','approved')">Kabul et</button><button class="btn" onclick="setStatus('app','${a.id}','rejected')">Reddet</button>`:'—'}</div></td></tr>`).join('')}</tbody></table>`:'<div class="empty">Henüz başvuru yok.</div>'}
 window.setStatus=(kind,id,status)=>{let arr=kind==='match'?state.matches:state.applications;let item=arr.find(x=>x.id===id);if(!item)return;if(kind==='match'&&status==='approved'&&state.matches.some(m=>m.id!==id&&m.date===item.date&&m.time===item.time&&m.status==='approved')){toast('Bu saat başka bir onaylı maçta kullanılıyor.');return}item.status=status;save(state);renderAdmin();renderTimeOptions();toast('Durum güncellendi: '+({approved:'Onaylandı',rejected:'Reddedildi'}[status]));};
 window.editPlayer=id=>{let p=state.players.find(x=>x.id===id);if(!p)return;$('editPlayerId').value=id;$('editPlayerNick').value=p.nick;$('editPlayerRank').value=p.rank;$('editPlayerPhoto').value='';$('editModal').classList.remove('hidden')};
-window.deletePlayer=id=>{let p=state.players.find(x=>x.id===id);if(p&&confirm(p.nick+' kadrodan silinsin mi?')){state.players=state.players.filter(x=>x.id!==id);save(state);renderPlayers();renderAdminPlayers();toast('Oyuncu silindi.')}};
+window.deletePlayer=async id=>{let p=state.players.find(x=>x.id===id);if(!p||!confirm(p.nick+' kadrodan silinsin mi?'))return;
+ if(remoteAdmin){if(!(await requireRemoteAdmin()))return;const {error}=await supabaseClient.from('players').delete().eq('id',id);if(error){toast('Silinemedi: yönetici RLS yetkisini kontrol et.');return}await fetchRemotePlayers();}
+ else {state.players=state.players.filter(x=>x.id!==id);save(state)}
+ renderPlayers();renderAdminPlayers();toast('Oyuncu silindi.');
+};
 $('closeModal').addEventListener('click',()=>$('editModal').classList.add('hidden'));
 function readImage(file){return new Promise((resolve,reject)=>{if(!file){resolve(null);return}if(!file.type.startsWith('image/')){reject(new Error('Lütfen görsel dosyası seç.'));return}let reader=new FileReader();reader.onload=()=>{let img=new Image();img.onload=()=>{let canvas=document.createElement('canvas'),max=420,scale=Math.min(1,max/Math.max(img.width,img.height));canvas.width=Math.round(img.width*scale);canvas.height=Math.round(img.height*scale);canvas.getContext('2d').drawImage(img,0,0,canvas.width,canvas.height);resolve(canvas.toDataURL('image/jpeg',.78))};img.onerror=()=>reject(new Error('Görsel açılamadı.'));img.src=reader.result};reader.onerror=()=>reject(new Error('Dosya okunamadı.'));reader.readAsDataURL(file)})}
-$('editPlayerForm').addEventListener('submit',async e=>{e.preventDefault();let p=state.players.find(x=>x.id===$('editPlayerId').value);if(!p)return;try{p.nick=$('editPlayerNick').value.trim();p.rank=$('editPlayerRank').value;let img=await readImage($('editPlayerPhoto').files[0]);if(img)p.avatar=img;save(state);$('editModal').classList.add('hidden');renderPlayers();renderAdminPlayers();toast('Oyuncu güncellendi.')}catch(err){toast(err.message)}});
-$('addPlayerForm').addEventListener('submit',async e=>{e.preventDefault();try{let img=await readImage($('newPlayerPhoto').files[0]);state.players.push({id:'p'+uid(),nick:$('newPlayerNick').value.trim(),rank:$('newPlayerRank').value,avatar:img||svgAvatar(state.players.length)});save(state);$('addPlayerForm').reset();renderPlayers();renderAdminPlayers();toast('Oyuncu eklendi.')}catch(err){toast(err.message)}});
+$('editPlayerForm').addEventListener('submit',async e=>{e.preventDefault();let p=state.players.find(x=>x.id===$('editPlayerId').value);if(!p)return;try{
+ let nick=$('editPlayerNick').value.trim(),rank=$('editPlayerRank').value,img=await readImage($('editPlayerPhoto').files[0]);
+ if(remoteAdmin){if(!(await requireRemoteAdmin()))return;let update={nick,rank};if(img){toast('Fotoğrafı kalıcı kullanmak için Supabase Storage kurulumu gerekir; nick/rank kaydediliyor.')}
+ const {error}=await supabaseClient.from('players').update(update).eq('id',p.id);if(error){toast('Güncellenemedi: yönetici RLS yetkisini kontrol et.');return}await fetchRemotePlayers();}
+ else {p.nick=nick;p.rank=rank;if(img)p.avatar=img;save(state)}
+ $('editModal').classList.add('hidden');renderPlayers();renderAdminPlayers();toast('Oyuncu güncellendi.');
+ }catch(err){toast(err.message)}});
+$('addPlayerForm').addEventListener('submit',async e=>{e.preventDefault();try{
+ let img=await readImage($('newPlayerPhoto').files[0]),nick=$('newPlayerNick').value.trim(),rank=$('newPlayerRank').value;
+ if(remoteAdmin){if(!(await requireRemoteAdmin()))return;if(img)toast('Fotoğraf bu sürümde veritabanına yüklenmiyor; oyuncu nick/rank ile eklenecek.');
+ const {error}=await supabaseClient.from('players').insert({nick,rank,active:true,sort_order:state.players.length});
+ if(error){toast('Eklenemedi: tablo izinlerini/yönetici rolünü kontrol et.');return}await fetchRemotePlayers();}
+ else {state.players.push({id:'p'+uid(),nick,rank,avatar:img||svgAvatar(state.players.length)});save(state)}
+ $('addPlayerForm').reset();renderPlayers();renderAdminPlayers();toast('Oyuncu eklendi.');
+ }catch(err){toast(err.message)}});
 $('addHistoryForm').addEventListener('submit',e=>{e.preventDefault();state.history.push({id:uid(),opponent:$('historyOpponent').value.trim(),score:$('historyScore').value.trim(),date:$('historyDate').value,result:$('historyResult').value});save(state);$('addHistoryForm').reset();renderHistory();toast('Maç sonucu eklendi.')});
 $('exportBtn').addEventListener('click',()=>{let blob=new Blob([JSON.stringify(state,null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='f4f-esports-yedek.json';a.click();URL.revokeObjectURL(url)});
 $('resetDemoBtn').addEventListener('click',()=>{if(confirm('Demo verileri sıfırlansın mı? Başvurular ve maç kayıtları silinir.')){state=seed();save(state);renderPlayers();renderHistory();renderDateOptions();renderAdmin();toast('Demo verileri sıfırlandı.')}});
 window.addEventListener('storage',e=>{if(e.key===KEY){state=load();renderPlayers();renderHistory();renderDateOptions();if(adminLogged)renderAdmin()}});
-function init(){renderRankChecks();renderDateOptions();renderPlayers();renderHistory();renderLogos();go('home')}
+async function init(){renderRankChecks();renderDateOptions();renderPlayers();renderHistory();renderLogos();go('home');
+ if(supabaseReady){const ok=await fetchRemotePlayers();if(ok)renderPlayers();}
+}
 init();
 </script>
 </body>
