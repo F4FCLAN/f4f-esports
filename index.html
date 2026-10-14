@@ -205,8 +205,16 @@ $('editPlayerForm').addEventListener('submit',async e=>{e.preventDefault();let p
  }catch(err){toast(err.message)}});
 $('addPlayerForm').addEventListener('submit',async e=>{e.preventDefault();try{
  let img=await readImage($('newPlayerPhoto').files[0]),nick=$('newPlayerNick').value.trim(),rank=$('newPlayerRank').value;
- if(remoteAdmin){if(!(await requireRemoteAdmin()))return;if(img)toast('Fotoğraf bu sürümde veritabanına yüklenmiyor; oyuncu nick/rank ile eklenecek.');
- const {error}=await supabaseClient.from('players').insert({nick,rank,active:true,sort_order:state.players.length});
+ if(remoteAdmin){
+  if(!(await requireRemoteAdmin()))return;
+  let avatar_url=null;
+  if(img){
+    const filePath=Date.now()+'-'+img.name.replace(/[^a-zA-Z0-9._-]/g,'_');
+    const {error:uploadError}=await supabaseClient.storage.from('player-avatars').upload(filePath,img);
+    if(uploadError){toast('Fotoğraf yüklenemedi: '+uploadError.message);return;}
+    avatar_url=supabaseClient.storage.from('player-avatars').getPublicUrl(filePath).data.publicUrl;
+  }
+const {error}=await supabaseClient.from('players').insert({nick,rank,avatar_url,active:true,sort_order:state.players.length});
  if(error){toast('Eklenemedi: tablo izinlerini/yönetici rolünü kontrol et.');return}await fetchRemotePlayers();}
  else {state.players.push({id:'p'+uid(),nick,rank,avatar:img||svgAvatar(state.players.length)});save(state)}
  $('addPlayerForm').reset();renderPlayers();renderAdminPlayers();toast('Oyuncu eklendi.');
