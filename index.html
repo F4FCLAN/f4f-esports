@@ -172,7 +172,45 @@ function renderDateOptions(){let sel=$('matchDate');sel.innerHTML='<option value
 function renderTimeOptions(){let date=$('matchDate').value,sel=$('matchTime');if(!date){sel.innerHTML='<option value="">Önce tarih seç</option>';return}let booked=state.matches.filter(m=>m.date===date&&m.status!=='rejected').map(m=>m.time);let now=new Date();sel.innerHTML='<option value="">Saat seç</option>'+TIMES.map(t=>{let dt=new Date(date+'T'+t+':00');let past=dt<now;let full=booked.includes(t);return `<option value="${t}" ${full||past?'disabled':''}>${t}${full?' · DOLU':past?' · GEÇTİ':''}</option>`}).join('')}
 $('matchDate').addEventListener('change',renderTimeOptions);
 $('matchForm').addEventListener('submit',e=>{e.preventDefault();let ranks=[...document.querySelectorAll('input[name="matchRank"]:checked')].map(x=>x.value);if(ranks.length!==2){toast('Tam olarak iki rank seçmelisin.');return}let date=$('matchDate').value,time=$('matchTime').value;if(!date||!time){toast('Lütfen gün ve saat seç.');return}if(state.matches.some(m=>m.date===date&&m.time===time&&m.status!=='rejected')){toast('Bu saat artık müsait değil.');renderTimeOptions();return}let code='F4F-'+uid();state.matches.push({id:uid(),code,clan:$('clanName').value.trim(),contact:$('contact').value.trim(),ranks,date,time,note:$('matchNote').value.trim(),status:'pending',created:new Date().toISOString()});save(state);$('matchForm').reset();document.querySelectorAll('input[name="matchRank"]').forEach(x=>x.checked=false);renderDateOptions();$('matchSubmitResult').innerHTML=`<div class="notice good"><strong>Talebin alındı.</strong><br>Takip kodun: <strong>${code}</strong><br>F4F yönetiminin onayını bekle. Durumunu “Başvuru / maç talebi sorgula” bölümünden takip edebilirsin. Bu kodu sakla.</div>`;toast('Maç talebi oluşturuldu.');});
-$('joinForm').addEventListener('submit',e=>{e.preventDefault();let code='F4F-'+uid();state.applications.push({id:uid(),code,nick:$('joinNick').value.trim(),name:$('joinName').value.trim(),age:Number($('joinAge').value),rank:$('joinRank').value,about:$('joinAbout').value.trim(),status:'pending',created:new Date().toISOString()});save(state);$('joinForm').reset();$('joinSubmitResult').innerHTML=`<div class="notice good"><strong>Başvurun alındı.</strong><br>Takip kodun: <strong>${code}</strong><br>F4F yönetiminin değerlendirmesini bekle. Kodunu sakla; sonucu sorgulama bölümünden görebilirsin.</div>`;toast('Başvuru kaydedildi.');});
+$('joinForm').addEventListener('submit', async e => {
+  e.preventDefault();
+
+  const code = 'F4F-' + uid();
+
+  const application = {
+    tracking_code: code,
+    game_nick: $('joinNick').value.trim(),
+    full_name: $('joinName').value.trim(),
+    age: Number($('joinAge').value),
+    rank: $('joinRank').value,
+    introduction: $('joinAbout').value.trim(),
+    status: 'pending'
+  };
+
+  try {
+    const { error } = await supabaseClient
+      .from('join_applications')
+      .insert(application);
+
+    if (error) {
+      toast('Başvuru kaydedilemedi: ' + error.message);
+      return;
+    }
+
+    $('joinForm').reset();
+
+    $('joinSubmitResult').innerHTML =
+      `<div class="notice good">
+        <strong>Başvurun alındı.</strong><br>
+        Takip kodun: <strong>${code}</strong><br>
+        F4F yönetiminin değerlendirmesini bekle.
+      </div>`;
+
+    toast('Başvuru kaydedildi.');
+  } catch (err) {
+    toast('Hata: ' + err.message);
+  }
+});
 $('trackForm').addEventListener('submit',e=>{e.preventDefault();let code=$('trackCode').value.trim().toUpperCase(),item=state.matches.find(x=>x.code===code),kind='Maç talebi';if(!item){item=state.applications.find(x=>x.code===code);kind='Klan başvurusu'}if(!item){$('trackResult').innerHTML='<div class="notice bad">Bu kodla eşleşen bir kayıt bulunamadı.</div>';return}let statusText={pending:'Onay bekleniyor',approved:'Onaylandı',rejected:'Reddedildi'}[item.status];$('trackResult').innerHTML=`<div class="notice ${item.status==='approved'?'good':item.status==='rejected'?'bad':''}"><strong>${kind}</strong><br>Durum: <strong>${statusText}</strong>${kind==='Maç talebi'?`<br>Klan: ${safe(item.clan)}<br>Talep: ${safe(item.date)} · ${safe(item.time)}<br>Ranklar: ${safe(item.ranks.join(' + '))}`:`<br>Oyun nicki: ${safe(item.nick)}<br>Rank: ${safe(item.rank)}`}</div>`});
 function renderAdmin(){if(!adminLogged){$('adminLogin').classList.remove('hidden');$('adminArea').classList.remove('show');return}$('adminLogin').classList.add('hidden');$('adminArea').classList.add('show');renderAdminPlayers();renderAdminMatches();renderAdminApps()}
 $('loginForm').addEventListener('submit',async e=>{
