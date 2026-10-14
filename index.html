@@ -113,7 +113,7 @@
     <div class="field"><label for="newPlayerPhoto">Avatar yükle (isteğe bağlı)</label><input id="newPlayerPhoto" type="file" accept="image/*"></div>
     <button class="btn primary" type="submit">Oyuncu ekle</button>
    </form></div>
-   <div class="panel"><h3>Kadroyu düzenle</h3><p class="sub">Her oyuncunun rankını, nickini ve avatarını buradan değiştirebilir; oyuncuyu kadrodan kaldırabilirsin.</p><p class="hint">Avatar yüklemeleri bu prototipte tarayıcı depolamasında saklanır. Büyük görseller depolama limitini doldurabilir.</p></div>
+   <div class="panel"><h3>Kadroyu düzenle</h3><p class="sub">Her oyuncunun rankını, nickini ve avatarını buradan değiştirebilir; oyuncuyu kadrodan kaldırabilirsin.</p><p class="hint">Avatarlar Supabase Storage alanında saklanır; fotoğraflar tüm ziyaretçilere görünür.</p></div>
   </div>
   <div class="panel" style="margin-top:16px"><h3>Oyuncu yönetimi</h3><div class="table-wrap" id="adminPlayers"></div></div>
   <div class="panel" style="margin-top:16px"><h3>Maç talepleri</h3><div class="table-wrap" id="adminMatches"></div></div>
@@ -122,7 +122,7 @@
  </div>
 </section>
 </main>
-<footer class="footer"><div class="wrap"><strong>F4F ESPORTS · F4FCLAN</strong><p>Family · Loyalty · Victory — PlayStation 5 Console Valorant</p><p>Oyuncu kadrosu Supabase bağlantısı ayarlandığında ortak veritabanından yüklenir. Maç talepleri, klan başvuruları ve maç geçmişi bu sürümde hâlâ yerel tarayıcıda saklanır.</p></div></footer>
+<footer class="footer"><div class="wrap"><strong>F4F ESPORTS · F4FCLAN</strong><p>Family · Loyalty · Victory — PlayStation 5 Console Valorant</p><p>Oyuncu kadrosu Supabase veritabanında saklanır. Maç talepleri, klan başvuruları ve maç geçmişi bu sürümde hâlâ yerel tarayıcıda saklanır.</p></div></footer>
 <div id="toast" class="toast hidden" role="status"></div>
 <div id="editModal" class="modal-backdrop hidden"><div class="modal"><h3>Oyuncuyu düzenle</h3><form id="editPlayerForm"><input id="editPlayerId" type="hidden"><div class="field"><label for="editPlayerNick">Oyun nicki</label><input id="editPlayerNick" required maxlength="40"></div><div class="field"><label for="editPlayerRank">Rank</label><select id="editPlayerRank"><option>Diamond</option><option>Ascendant</option><option>Immortal</option><option>Radiant</option></select></div><div class="field"><label for="editPlayerPhoto">Yeni avatar yükle</label><input id="editPlayerPhoto" type="file" accept="image/*"></div><div class="small-actions"><button class="btn primary" type="submit">Kaydet</button><button class="btn" type="button" id="closeModal">İptal</button></div></form></div></div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -204,21 +204,30 @@ $('editPlayerForm').addEventListener('submit',async e=>{e.preventDefault();let p
  $('editModal').classList.add('hidden');renderPlayers();renderAdminPlayers();toast('Oyuncu güncellendi.');
  }catch(err){toast(err.message)}});
 $('addPlayerForm').addEventListener('submit',async e=>{e.preventDefault();try{
- let img=await readImage($('newPlayerPhoto').files[0]),nick=$('newPlayerNick').value.trim(),rank=$('newPlayerRank').value;
+ const photoFile=$('newPlayerPhoto').files[0];
+ const img=await readImage(photoFile);
+ const nick=$('newPlayerNick').value.trim();
+ const rank=$('newPlayerRank').value;
  if(remoteAdmin){
   if(!(await requireRemoteAdmin()))return;
   let avatar_url=null;
-  if(img){
-    const filePath=Date.now()+'-'+img.name.replace(/[^a-zA-Z0-9._-]/g,'_');
-    const {error:uploadError}=await supabaseClient.storage.from('player-avatars').upload(filePath,img);
-    if(uploadError){toast('Fotoğraf yüklenemedi: '+uploadError.message);return;}
-    avatar_url=supabaseClient.storage.from('player-avatars').getPublicUrl(filePath).data.publicUrl;
+  if(photoFile){
+   const safeName=photoFile.name.replace(/[^a-zA-Z0-9._-]/g,'_');
+   const filePath=Date.now()+'-'+safeName;
+   const {error:uploadError}=await supabaseClient.storage.from('player-avatars').upload(filePath,photoFile,{upsert:false,contentType:photoFile.type});
+   if(uploadError){toast('Fotoğraf yüklenemedi: '+uploadError.message);return;}
+   avatar_url=supabaseClient.storage.from('player-avatars').getPublicUrl(filePath).data.publicUrl;
   }
-const {error}=await supabaseClient.from('players').insert({nick,rank,avatar_url,active:true,sort_order:state.players.length});
- if(error){toast('Eklenemedi: tablo izinlerini/yönetici rolünü kontrol et.');return}await fetchRemotePlayers();}
- else {state.players.push({id:'p'+uid(),nick,rank,avatar:img||svgAvatar(state.players.length)});save(state)}
+  const {error}=await supabaseClient.from('players').insert({nick,rank,avatar_url,active:true,sort_order:state.players.length});
+  if(error){toast('Oyuncu eklenemedi: '+error.message);return;}
+  await fetchRemotePlayers();
+ } else {
+  state.players.push({id:'p'+uid(),nick,rank,avatar:img||svgAvatar(state.players.length)});
+  save(state);
+ }
  $('addPlayerForm').reset();renderPlayers();renderAdminPlayers();toast('Oyuncu eklendi.');
- }catch(err){toast(err.message)}});
+ }catch(err){toast('İşlem başarısız: '+(err?.message||String(err)));}});
+
 $('addHistoryForm').addEventListener('submit',e=>{e.preventDefault();state.history.push({id:uid(),opponent:$('historyOpponent').value.trim(),score:$('historyScore').value.trim(),date:$('historyDate').value,result:$('historyResult').value});save(state);$('addHistoryForm').reset();renderHistory();toast('Maç sonucu eklendi.')});
 $('exportBtn').addEventListener('click',()=>{let blob=new Blob([JSON.stringify(state,null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='f4f-esports-yedek.json';a.click();URL.revokeObjectURL(url)});
 $('resetDemoBtn').addEventListener('click',()=>{if(confirm('Demo verileri sıfırlansın mı? Başvurular ve maç kayıtları silinir.')){state=seed();save(state);renderPlayers();renderHistory();renderDateOptions();renderAdmin();toast('Demo verileri sıfırlandı.')}});
