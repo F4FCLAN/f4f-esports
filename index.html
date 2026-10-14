@@ -224,7 +224,51 @@ $('logoutBtn').addEventListener('click',async()=>{if(supabaseReady)await supabas
 function renderAdminPlayers(){$('adminPlayers').innerHTML=`<table><thead><tr><th>Avatar</th><th>Nick</th><th>Rank</th><th>İşlemler</th></tr></thead><tbody>${state.players.map(p=>`<tr><td><img src="${p.avatar}" alt="" style="width:44px;height:44px;object-fit:cover;border-radius:8px"></td><td>${safe(p.nick)}</td><td>${safe(p.rank)}</td><td><div class="small-actions"><button class="btn" onclick="editPlayer('${p.id}')">Düzenle</button><button class="btn" onclick="deletePlayer('${p.id}')">Sil</button></div></td></tr>`).join('')}</tbody></table>`}
 function statusPill(s){return `<span class="status ${s}">${({pending:'Onay bekliyor',approved:'Onaylandı',rejected:'Reddedildi'})[s]}</span>`}
 function renderAdminMatches(){$('adminMatches').innerHTML=state.matches.length?`<table><thead><tr><th>Klan / iletişim</th><th>Ranklar</th><th>Tarih / saat</th><th>Durum</th><th>İşlem</th></tr></thead><tbody>${state.matches.map(m=>`<tr><td><strong>${safe(m.clan)}</strong><br>${safe(m.contact)}<br><small>Kod: ${safe(m.code)}</small></td><td>${safe(m.ranks.join(' + '))}</td><td>${safe(m.date)}<br>${safe(m.time)}</td><td>${statusPill(m.status)}</td><td><div class="small-actions">${m.status==='pending'?`<button class="btn primary" onclick="setStatus('match','${m.id}','approved')">Onayla</button><button class="btn" onclick="setStatus('match','${m.id}','rejected')">Reddet</button>`:'—'}</div></td></tr>`).join('')}</tbody></table>`:'<div class="empty">Henüz maç talebi yok.</div>'}
-function renderAdminApps(){$('adminApplications').innerHTML=state.applications.length?`<table><thead><tr><th>Oyuncu</th><th>Yaş / Rank</th><th>Tanıtım</th><th>Durum</th><th>İşlem</th></tr></thead><tbody>${state.applications.map(a=>`<tr><td><strong>${safe(a.nick)}</strong><br>${safe(a.name)}<br><small>Kod: ${safe(a.code)}</small></td><td>${safe(a.age)}<br>${safe(a.rank)}</td><td>${safe(a.about||'—')}</td><td>${statusPill(a.status)}</td><td><div class="small-actions">${a.status==='pending'?`<button class="btn primary" onclick="setStatus('app','${a.id}','approved')">Kabul et</button><button class="btn" onclick="setStatus('app','${a.id}','rejected')">Reddet</button>`:'—'}</div></td></tr>`).join('')}</tbody></table>`:'<div class="empty">Henüz başvuru yok.</div>'}
+async function renderAdminApps() {
+  const el = $('adminApplications');
+
+  if (!remoteAdmin || !supabaseReady) {
+    el.innerHTML = '<div class="empty">Başvuruları görmek için yönetici hesabıyla giriş yap.</div>';
+    return;
+  }
+
+  const { data, error } = await supabaseClient
+    .from('join_applications')
+    .select('*')
+    .order('created_at', { ascending: false });
+
+  if (error) {
+    el.innerHTML = '<div class="empty">Başvurular alınamadı: ' + safe(error.message) + '</div>';
+    return;
+  }
+
+  if (!data || !data.length) {
+    el.innerHTML = '<div class="empty">Henüz başvuru yok.</div>';
+    return;
+  }
+
+  el.innerHTML = `<table>
+    <thead><tr>
+      <th>Oyuncu</th><th>Yaş / Rank</th><th>Tanıtım</th><th>Durum</th><th>İşlem</th>
+    </tr></thead>
+    <tbody>${data.map(a => {
+      const status = a.status || 'pending';
+      const statusText = status === 'pending' ? 'Onay bekliyor' :
+        status === 'approved' ? 'Onaylandı' : 'Reddedildi';
+
+      return `<tr>
+        <td><strong>${safe(a.game_nick)}</strong><br>
+          ${safe(a.full_name)}<br>
+          <small>Kod: ${safe(a.tracking_code)}</small>
+        </td>
+        <td>${safe(a.age)}<br>${safe(a.rank)}</td>
+        <td>${safe(a.introduction || '—')}</td>
+        <td>${safe(statusText)}</td>
+        <td>${status === 'pending' ? 'Yönetici işlemi sonraki adımda bağlanacak.' : '—'}</td>
+      </tr>`;
+    }).join('')}</tbody>
+  </table>`;
+}
 window.setStatus=(kind,id,status)=>{let arr=kind==='match'?state.matches:state.applications;let item=arr.find(x=>x.id===id);if(!item)return;if(kind==='match'&&status==='approved'&&state.matches.some(m=>m.id!==id&&m.date===item.date&&m.time===item.time&&m.status==='approved')){toast('Bu saat başka bir onaylı maçta kullanılıyor.');return}item.status=status;save(state);renderAdmin();renderTimeOptions();toast('Durum güncellendi: '+({approved:'Onaylandı',rejected:'Reddedildi'}[status]));};
 window.editPlayer=id=>{let p=state.players.find(x=>x.id===id);if(!p)return;$('editPlayerId').value=id;$('editPlayerNick').value=p.nick;$('editPlayerRank').value=p.rank;$('editPlayerPhoto').value='';$('editModal').classList.remove('hidden')};
 window.deletePlayer=async id=>{let p=state.players.find(x=>x.id===id);if(!p||!confirm(p.nick+' kadrodan silinsin mi?'))return;
