@@ -172,11 +172,13 @@ function renderDateOptions(){let sel=$('matchDate');sel.innerHTML='<option value
 function renderTimeOptions(){let date=$('matchDate').value,sel=$('matchTime');if(!date){sel.innerHTML='<option value="">Önce tarih seç</option>';return}let booked=state.matches.filter(m=>m.date===date&&m.status!=='rejected').map(m=>m.time);let now=new Date();sel.innerHTML='<option value="">Saat seç</option>'+TIMES.map(t=>{let dt=new Date(date+'T'+t+':00');let past=dt<now;let full=booked.includes(t);return `<option value="${t}" ${full||past?'disabled':''}>${t}${full?' · DOLU':past?' · GEÇTİ':''}</option>`}).join('')}
 $('matchDate').addEventListener('change',renderTimeOptions);
 
+
 $('matchForm').addEventListener('submit', async e => {
   e.preventDefault();
 
-  const ranks = [...document.querySelectorAll('input[name="matchRank"]:checked')]
-    .map(x => x.value);
+  const ranks = [
+    ...document.querySelectorAll('input[name="matchRank"]:checked')
+  ].map(x => x.value);
 
   if (ranks.length !== 2) {
     toast('Tam olarak iki rank seçmelisin.');
@@ -194,39 +196,45 @@ $('matchForm').addEventListener('submit', async e => {
   const code = 'F4F-' + uid();
 
   const request = {
-    takip_kodu: code,
-    rakip_klan: $('clanName').value.trim(),
-    temas_etmek: $('contact').value.trim(),
-    sira_bir: ranks[0],
-    sira_iki: ranks[1],
-    mac_tarihi: date,
-    mac_saati: time,
-    notlar: $('matchNote').value.trim(),
-    durum: 'pending'
+    tracking_code: code,
+    rival_clan: $('clanName').value.trim(),
+    contact: $('contact').value.trim(),
+    rank_one: ranks[0],
+    rank_two: ranks[1],
+    match_date: date,
+    match_time: time,
+    note: $('matchNote').value.trim(),
+    status: 'pending'
   };
 
-  const { error } = await supabaseClient
-    .from('eşleşme_istekleri')
-    .insert(request);
+  try {
+    const { error } = await supabaseClient
+      .from('match_requests')
+      .insert(request);
 
-  if (error) {
-    toast('Talep kaydedilemedi: ' + error.message);
-    return;
+    if (error) {
+      toast('Talep kaydedilemedi: ' + error.message);
+      return;
+    }
+
+    $('matchForm').reset();
+
+    document.querySelectorAll('input[name="matchRank"]')
+      .forEach(x => x.checked = false);
+
+    renderDateOptions();
+
+    $('matchSubmitResult').innerHTML =
+      `<div class="notice good">
+        <strong>Maç talebin alındı.</strong><br>
+        Takip kodun: <strong>${code}</strong><br>
+        F4F yönetiminin onayını bekle.
+      </div>`;
+
+    toast('Maç talebi kaydedildi.');
+  } catch (err) {
+    toast('Hata: ' + err.message);
   }
-
-  $('matchForm').reset();
-  document.querySelectorAll('input[name="matchRank"]')
-    .forEach(x => x.checked = false);
-
-  renderDateOptions();
-
-  $('matchSubmitResult').innerHTML =
-    `<div class="notice good">
-      <strong>Talebin alındı.</strong><br>
-      Takip kodun: <strong>${code}</strong>
-    </div>`;
-
-  toast('Maç talebi kaydedildi.');
 });
 
 
