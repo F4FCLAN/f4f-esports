@@ -238,6 +238,10 @@ $('matchForm').addEventListener('submit', async e => {
 });
 
 
+ 
+$('joinForm').addEventListener('submit', async e => {
+  e.preventDefault();
+
   const code = 'F4F-' + uid();
 
   const application = {
@@ -274,6 +278,7 @@ $('matchForm').addEventListener('submit', async e => {
     toast('Hata: ' + err.message);
   }
 });
+
 $('trackForm').addEventListener('submit',e=>{e.preventDefault();let code=$('trackCode').value.trim().toUpperCase(),item=state.matches.find(x=>x.code===code),kind='Maç talebi';if(!item){item=state.applications.find(x=>x.code===code);kind='Klan başvurusu'}if(!item){$('trackResult').innerHTML='<div class="notice bad">Bu kodla eşleşen bir kayıt bulunamadı.</div>';return}let statusText={pending:'Onay bekleniyor',approved:'Onaylandı',rejected:'Reddedildi'}[item.status];$('trackResult').innerHTML=`<div class="notice ${item.status==='approved'?'good':item.status==='rejected'?'bad':''}"><strong>${kind}</strong><br>Durum: <strong>${statusText}</strong>${kind==='Maç talebi'?`<br>Klan: ${safe(item.clan)}<br>Talep: ${safe(item.date)} · ${safe(item.time)}<br>Ranklar: ${safe(item.ranks.join(' + '))}`:`<br>Oyun nicki: ${safe(item.nick)}<br>Rank: ${safe(item.rank)}`}</div>`});
 function renderAdmin(){if(!adminLogged){$('adminLogin').classList.remove('hidden');$('adminArea').classList.remove('show');return}$('adminLogin').classList.add('hidden');$('adminArea').classList.add('show');renderAdminPlayers();renderAdminMatches();renderAdminApps()}
 $('loginForm').addEventListener('submit',async e=>{
