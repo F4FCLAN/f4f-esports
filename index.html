@@ -148,6 +148,13 @@ let state=load(),adminLogged=false,remoteAdmin=false;
 function toast(msg){$('toast').textContent=msg;$('toast').classList.remove('hidden');setTimeout(()=>$('toast').classList.add('hidden'),3000)}
 function go(id){document.querySelectorAll('main section').forEach(s=>s.classList.add('hidden'));$(id).classList.remove('hidden');window.scrollTo({top:0,behavior:'smooth'});if(id==='admin')renderAdmin()}
 document.querySelectorAll('[data-go]').forEach(b=>b.addEventListener('click',()=>go(b.dataset.go)));
+  document.addEventListener('touchend', function(e) {
+  const btn = e.target.closest('[data-go]');
+  if (btn) {
+    e.preventDefault();
+    go(btn.dataset.go);
+  }
+}, { passive: false });
 $('adminNav').addEventListener('click',()=>go('admin'));
 function renderLogos(){let strip=$('logoStrip');strip.innerHTML='';let logo='assets/f4f-logo-transparent.png';let html='';if(fileExists(logo))html+=`<img src="${logo}" alt="F4F Esports logosu">`;strip.innerHTML=html+'<span>F4FCLAN · PlayStation 5</span>';if(fileExists(logo))$('heroArt').innerHTML=`<img src="${logo}" alt="F4F Fight For Freedom logosu">`}
 function fileExists(path){return true} // Relative images may be absent in a standalone preview; browser handles fallback.
