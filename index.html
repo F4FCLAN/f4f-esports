@@ -102,12 +102,13 @@ async function renderAdminRequests(){
                 data-match-status="approved" data-id="${m.id}">Onayla</button>
               <button class="btn small"
                 data-match-status="rejected" data-id="${m.id}">Reddet</button>`;
-          }else if(m.status==='approved'){
-            actions=`
- actions=`
-  <button class="btn small"
-    data-match-status="cancelled" data-id="${m.id}">İptal Et</button>`;
+       
+}else if(m.status==='approved'){
+  actions=`
+    <button class="btn small"
+      data-match-status="cancelled" data-id="${m.id}">İptal Et</button>`;
 }
+
           return `
             <tr>
               <td><b>${safe(m.rival_clan)}</b><br>
