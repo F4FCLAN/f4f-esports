@@ -61,7 +61,88 @@ async function renderAdminPlayers(){const {data,error}=await db.from('players').
 function renderAccountPlayers(){const s=$('accountPlayer');if(!s)return;const current=s.value;s.innerHTML='<option value="">Oyuncu seç</option>'+players.map(p=>`<option value="${safe(p.id)}">${safe(p.nick)} · ${safe(p.rank)}</option>`).join('');if(current)s.value=current}
 $('addPlayerForm').addEventListener('submit',async e=>{e.preventDefault();if(!adminUser)return;const {error}=await db.from('players').insert({nick:$('newNick').value.trim(),rank:$('newRank').value,active:true,sort_order:players.length});if(error){toast('Oyuncu eklenemedi: '+error.message);return}$('addPlayerForm').reset();await refreshAdmin();toast('Oyuncu kadroya eklendi.')});
 $('createAccountForm').addEventListener('submit',async e=>{e.preventDefault();if(!adminUser)return;const {data:{session}}=await db.auth.getSession();if(!session){toast('Yönetici oturumu bulunamadı.');return}const username=$('accountUsername').value.trim().toLowerCase();$('accountResult').innerHTML='<p class="hint">Hesap oluşturuluyor…</p>';try{const res=await fetch(`${SUPABASE_URL}/functions/v1/admin-create-player`,{method:'POST',headers:{'Content-Type':'application/json','Authorization':`Bearer ${session.access_token}`,'apikey':SUPABASE_PUBLISHABLE_KEY},body:JSON.stringify({player_id:$('accountPlayer').value,username,password:$('accountPassword').value})});const out=await res.json();if(!res.ok)throw new Error(out.error||'Hesap oluşturulamadı');$('accountResult').innerHTML='<div class="notice good">Oyuncu hesabı oluşturuldu. Kullanıcı adını ve şifreyi oyuncuya özel olarak ilet.</div>';$('createAccountForm').reset()}catch(err){$('accountResult').innerHTML=`<div class="notice">${safe(err.message)}</div>`}});
-async function renderAdminRequests(){const {data,error}=await db.from('match_requests').select('*').order('created_at',{ascending:false});if(error){$('adminRequests').textContent=error.message;return}$('adminRequests').innerHTML=data?.length?`<table><thead><tr><th>Klan / iletişim</th><th>Ranklar</th><th>Maç zamanı</th><th>Durum / işlem</th></tr></thead><tbody>${data.map(m=>`<tr><td><b>${safe(m.rival_clan)}</b><br>${safe(m.contact)}<br><span class="hint">${safe(m.tracking_code)}</span></td><td>${safe(m.rank_one)} + ${safe(m.rank_two)}</td><td>${safe(m.match_date)} · ${safe(m.match_time||'')}</td><td>${safe(m.status)}<br>${m.status==='pending'?`<button class="btn small primary" data-match-status="approved" data-id="${m.id}">Onayla</button> <button class="btn small" data-match-status="rejected" data-id="${m.id}">Reddet</button>`:''}</td></tr>`).join('')}</tbody></table>`:'Henüz maç talebi yok.';document.querySelectorAll('[data-match-status]').forEach(b=>b.addEventListener('click',async()=>{const {error}=await db.from('match_requests').update({status:b.dataset.matchStatus}).eq('id',b.dataset.id);if(error){toast('Durum değiştirilemedi: '+error.message);return}await refreshAdmin();toast('Maç talebi güncellendi.') }))}
+
+async function renderAdminRequests(){
+  const {data,error}=await db
+    .from('match_requests')
+    .select('*')
+    .order('match_date',{ascending:true});
+
+  if(error){
+    $('adminRequests').textContent=error.message;
+    return;
+  }
+
+  const rows=data||[];
+
+  $('adminRequests').innerHTML=rows.length?`
+    <h3>Maç Talepleri ve Onaylanan Maçlar</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Klan / iletişim</th>
+          <th>Ranklar</th>
+          <th>Maç tarihi</th>
+          <th>Saat</th>
+          <th>Durum / işlem</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${rows.map(m=>{
+          const date=m.match_date
+            ?String(m.match_date).slice(0,10).split('-').reverse().join('.')
+            :'—';
+          const time=m.match_time||'Belirtilmedi';
+
+          let actions='';
+
+          if(m.status==='pending'){
+            actions=`
+              <button class="btn small primary"
+                data-match-status="approved" data-id="${m.id}">Onayla</button>
+              <button class="btn small"
+                data-match-status="rejected" data-id="${m.id}">Reddet</button>`;
+          }else if(m.status==='approved'){
+            actions=`
+              <button class="btn small"
+                data-match-status="cancelled" data-id="${m.id}"
+                onclick="if(!confirm('Bu maçı iptal etmek istediğine emin misin?')) return;">İptal Et</button>`;
+          }
+
+          return `
+            <tr>
+              <td><b>${safe(m.rival_clan)}</b><br>
+                ${safe(m.contact)}<br>
+                <span class="hint">${safe(m.tracking_code)}</span>
+              </td>
+              <td>${safe(m.rank_one)} + ${safe(m.rank_two)}</td>
+              <td>${date}</td>
+              <td>${safe(time)}</td>
+              <td>${safe(m.status)}<br>${actions}</td>
+            </tr>`;
+        }).join('')}
+      </tbody>
+    </table>`:'Henüz maç talebi yok.';
+
+  document.querySelectorAll('[data-match-status]').forEach(b=>{
+    b.addEventListener('click',async()=>{
+      if(b.dataset.matchStatus==='cancelled' &&
+         !confirm('Bu maçı iptal etmek istediğine emin misin?')) return;
+
+      const {error}=await db.from('match_requests')
+        .update({status:b.dataset.matchStatus})
+        .eq('id',b.dataset.id);
+
+      if(error){
+        toast('Durum değiştirilemedi: '+error.message);
+        return;
+      }
+
+      await refreshAdmin();
+      toast('Maç talebi güncellendi.');
+    });
+  });
+}
 async function renderAdminApps(){const {data,error}=await db.from('join_applications').select('*').order('created_at',{ascending:false});if(error){$('adminApplications').textContent=error.message;return}$('adminApplications').innerHTML=data?.length?`<table><thead><tr><th>Oyuncu</th><th>Yaş / rank</th><th>Tanıtım</th><th>Durum / işlem</th></tr></thead><tbody>${data.map(a=>`<tr><td><b>${safe(a.game_nick)}</b><br>${safe(a.full_name)}<br><span class="hint">${safe(a.tracking_code)}</span></td><td>${safe(a.age)} · ${safe(a.rank)}</td><td>${safe(a.introduction||'—')}</td><td>${safe(a.status)}<br>${a.status==='pending'?`<button class="btn small primary" data-app-status="approved" data-id="${a.id}">Onayla</button> <button class="btn small" data-app-status="rejected" data-id="${a.id}">Reddet</button>`:''}</td></tr>`).join('')}</tbody></table>`:'Henüz başvuru yok.';document.querySelectorAll('[data-app-status]').forEach(b=>b.addEventListener('click',async()=>{const {error}=await db.from('join_applications').update({status:b.dataset.appStatus}).eq('id',b.dataset.id);if(error){toast('Başvuru güncellenemedi: '+error.message);return}await renderAdminApps();toast('Başvuru durumu güncellendi.') }))}
 $('resultForm').addEventListener('submit',async e=>{e.preventDefault();const {error}=await db.from('matches').insert({opponent:$('resultOpponent').value.trim(),score:$('resultScore').value.trim(),match_date:$('resultDate').value,result:$('resultOutcome').value});if(error){toast('Sonuç kaydedilemedi: '+error.message);return}$('resultForm').reset();await loadHistory();toast('Maç sonucu kaydedildi.')});
 $('playerLoginForm').addEventListener('submit',async e=>{e.preventDefault();const username=$('playerUsername').value.trim().toLowerCase();const email=`${username}@players.f4f.local`;const {error}=await db.auth.signInWithPassword({email,password:$('playerPassword').value});if(error){toast('Giriş başarısız. Kullanıcı adı ve şifreyi kontrol et.');return}const {data:{user}}=await db.auth.getUser();const {data:profile,error:pe}=await db.from('player_profiles').select('*').eq('user_id',user.id).maybeSingle();if(pe||!profile){await db.auth.signOut();toast('Bu hesaba oyuncu profili bağlanmamış. Yöneticiyle görüş.');return}currentPlayer={user,profile};const {data:player}=await db.from('players').select('*').eq('id',profile.player_id).maybeSingle();currentPlayer.player=player;$('playerLoginPanel').classList.add('hidden');$('publicProfile').classList.add('hidden');$('playerEditor').classList.remove('hidden');$('playerIdentity').textContent=`${player.nick} · ${player.rank}`;$('editNick').value=player.nick;$('editRank').value=player.rank;$('editBio').value=profile.bio||'';$('editTikTok').value=profile.tiktok_url||'';$('editShowStats').checked=profile.show_stats!==false;$('editWin').value=profile.win_rate??'';$('editHs').value=profile.headshot_pct??'';$('editKd').value=profile.kd??'';$('editAcs').value=profile.acs??'';toast('Oyuncu girişi başarılı.')});
